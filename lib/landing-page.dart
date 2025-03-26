@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'signin_page.dart';
+import 'home_page.dart'; // Import your home page
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -9,14 +11,32 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
+  
   @override
   void initState() {
     super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("token"); // Retrieve saved token
+
+    // Redirect after 5 seconds
     Future.delayed(const Duration(seconds: 5), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SignInPage()),
-      );
+      if (token != null && token.isNotEmpty) {
+        // If user is logged in, go to HomePage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else {
+        // Otherwise, go to SignInPage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const SignInPage()),
+        );
+      }
     });
   }
 

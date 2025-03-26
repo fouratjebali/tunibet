@@ -1,5 +1,9 @@
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'signup-page.dart';
 
@@ -70,7 +74,7 @@ class _SignInPageState extends State<SignInPage> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.grey[100],
-                  hintText: 'email',
+                  hintText: 'Email',
                   prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -118,16 +122,34 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   onPressed: () async {
-                    /*final email = _email.text;
+                    final email = _email.text;
                     final password = _password.text;
-                    await Firebase.initializeApp(
-                      options: DefaultFirebaseOptions.currentPlatform,
+                    const String apiUrl = "http://localhost:5000/api/users/login";
+                    final response = await http.post(
+                    Uri.parse(apiUrl),
+                    headers: {"Content-Type": "application/json"},
+                    body: jsonEncode({
+                      "email": email,
+                      "password": password,
+                      }),
                     );
-                    final UserCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-                    print(UserCredential);*/
+
+                    final data = jsonDecode(response.body);
+
+                    if (response.statusCode == 200) {
+                      // Save token
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      await prefs.setString("token", data["token"]);
+                      await prefs.setString("userEmail", data["user"]["email"]);
+
+                      // Navigate to main page
+                      Navigator.pushReplacementNamed(context, "/home");// MAIN
+                    } else {
+                      // Show error message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(data["message"])),
+                      );
+                    }
                   },
                   child: const Text(
                     'LOGIN',
