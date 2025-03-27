@@ -1,38 +1,38 @@
-
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tunibet/signin-dealer.dart';
-
+import 'dart:convert';
 import 'signup-page.dart';
+import 'package:http/http.dart' as http;
 
-
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
-
+class SignUpDealer extends StatefulWidget {
+  const SignUpDealer({super.key});
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<SignUpDealer> createState() => _SignUpPageState();
 }
-
-class _SignInPageState extends State<SignInPage> {
+  
+class _SignUpPageState extends State<SignUpDealer> {
   late final TextEditingController _email;
   late final TextEditingController _password;
-  
+  late final TextEditingController _phone;
+  late final TextEditingController _companyname;
+
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _email = TextEditingController();
     _password = TextEditingController();
-  }
-  @override
-  void dispose(){
-    _email.dispose();
-    _password.dispose();
-    super.dispose();
+    _companyname = TextEditingController();
+    _phone = TextEditingController();
   }
 
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    _phone.dispose();
+    _companyname.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,19 +44,19 @@ class _SignInPageState extends State<SignInPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 30),
+              const SizedBox(height: 0),
               Image.asset(
-                'assets/logo-black.png', 
+                'assets/logo-black.png',
                 height: 150,
               ),
               const SizedBox(height: 16),
               const Text(
-                'LOGIN',
+                'SIGN UP AS A DEALER',
                 style: TextStyle(
+                  fontFamily: 'Poppins',
+                  color: Colors.black,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontFamily: 'Poppins'
                 ),
               ),
               const SizedBox(height: 10),
@@ -65,53 +65,66 @@ class _SignInPageState extends State<SignInPage> {
                 style: TextStyle(fontSize: 16,
                 color: Colors.black,
                 fontFamily: 'Poppins',
-
                  ),
               ),
-              const SizedBox(height: 80),
+              const SizedBox(height: 50),
               TextField(
-                controller: _email,
-                keyboardType: TextInputType.emailAddress,
+                controller: _companyname,
                 decoration: InputDecoration(
-                  filled: true,
                   fillColor: Colors.grey[100],
-                  hintText: 'Email',
+                  filled: true,
+                  hintText: 'Company Name',
                   prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
-                  ),
+                  )
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
               TextField(
-                controller: _password,
-                obscureText: true,
-                autocorrect: false,
+                controller: _email,
                 decoration: InputDecoration(
-                  filled: true,
                   fillColor: Colors.grey[100],
-                  hintText: 'Password',
-                  prefixIcon: const Icon(Icons.visibility_off_outlined, color: Colors.grey),
+                  filled: true,
+                  hintText: 'Email address for customer inquiries',
+                  prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
-                  ),
+                  )
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _password,
+                obscureText: true,
+                decoration: InputDecoration(
+                  fillColor: Colors.grey[100],
+                  filled: true,
+                  hintText: 'Password',
+                  prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  )
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _phone,
+                decoration: InputDecoration(
+                  fillColor: Colors.grey[100],
+                  filled: true,
+                  hintText: 'Company Mobile Phone Number',
+                  prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  )
                 ),
               ),
               const SizedBox(height: 20),
-
-              
-              TextButton(
-                onPressed: () {},
-                child: const Text(
-                  'Forgot password ?',
-                  style: TextStyle(color: Colors.black54),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -125,35 +138,37 @@ class _SignInPageState extends State<SignInPage> {
                   onPressed: () async {
                     final email = _email.text;
                     final password = _password.text;
-                    const String apiUrl = "http://10.0.2.2:5000/api/users/login";
+                    final phone = _phone.text;
+                    final name = _companyname.text;
+                    
+                    const String apiUrl = "http://localhost:5000/api/users/register";
+
                     final response = await http.post(
-                    Uri.parse(apiUrl),
-                    headers: {"Content-Type": "application/json"},
-                    body: jsonEncode({
-                      "email": email,
-                      "password": password,
+                      Uri.parse(apiUrl),
+                      headers: {"Content-Type": "application/json"},
+                      body: jsonEncode({
+                        "fullName": name,
+                        "email": email,
+                        "password": password,
+                        "phoneNumber": phone,
                       }),
                     );
 
-                    final data = jsonDecode(response.body);
-
-                    if (response.statusCode == 200) {
-                      // Save token
-                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                      await prefs.setString("token", data["token"]);
-                      await prefs.setString("userEmail", data["user"]["email"]);
-
-                      // Navigate to main page
-                      Navigator.pushReplacementNamed(context, "/home");// MAIN
-                    } else {
-                      // Show error message
+                    if (response.statusCode == 201) {
+                      final responseData = jsonDecode(response.body);
+                      print("User Created: ${responseData['user']}");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(data["message"])),
+                        SnackBar(content: Text("User created successfully!")),
+                      );
+                    } else {
+                      print("Error: ${response.body}");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Failed to create user")),
                       );
                     }
                   },
                   child: const Text(
-                    'LOGIN',
+                    'SIGN UP',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.white,
@@ -163,13 +178,12 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                 ),
               ),
-
-              const SizedBox(height: 100),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "don’t have an account? ",
+                    "Are you a simple user?",
                     style: TextStyle(color: Colors.black54),
                   ),
                   GestureDetector(
@@ -182,34 +196,7 @@ class _SignInPageState extends State<SignInPage> {
                       );
                     },
                     child: const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        color: Color(0xFF56021F),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),        
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Are you a dealer? ",
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SignInDealer(),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'Dealer Login',
+                      'User Sign up',
                       style: TextStyle(
                         color: Color(0xFF56021F),
                         fontWeight: FontWeight.bold,

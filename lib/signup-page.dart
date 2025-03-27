@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:convert';
 import 'signin_page.dart';
+import 'signup-dealer.dart';
 import 'package:http/http.dart' as http;
 
 class SignUpPage extends StatefulWidget {
@@ -142,7 +143,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     final phone = _phone.text;
                     final name = _name.text;
                     
-                    const String apiUrl = "http://localhost:5000/api/users/register";
+                    const String apiUrl = "http://10.0.2.2:5000/api/users/register";
 
                     final response = await http.post(
                       Uri.parse(apiUrl),
@@ -230,7 +231,34 @@ class _SignUpPageState extends State<SignUpPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "already have an account? ",
+                    "Are you a dealer?",
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SignUpDealer(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Sign up As A Dealer',
+                      style: TextStyle(
+                        color: Color(0xFF56021F),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),        
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Already have an account?",
                     style: TextStyle(color: Colors.black54),
                   ),
                   GestureDetector(
@@ -243,7 +271,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       );
                     },
                     child: const Text(
-                      'Login',
+                      'login',
                       style: TextStyle(
                         color: Color(0xFF56021F),
                         fontWeight: FontWeight.bold,

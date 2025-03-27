@@ -4,19 +4,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tunibet/signin-dealer.dart';
 
 import 'signup-page.dart';
 
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+class SignInDealer extends StatefulWidget {
+  const SignInDealer({super.key});
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<SignInDealer> createState() => _SignInPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInPageState extends State<SignInDealer> {
   late final TextEditingController _email;
   late final TextEditingController _password;
   
@@ -51,7 +50,7 @@ class _SignInPageState extends State<SignInPage> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'LOGIN',
+                'LOGIN AS A DEALER',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -75,7 +74,7 @@ class _SignInPageState extends State<SignInPage> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.grey[100],
-                  hintText: 'Email',
+                  hintText: 'Company Email',
                   prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -125,7 +124,7 @@ class _SignInPageState extends State<SignInPage> {
                   onPressed: () async {
                     final email = _email.text;
                     final password = _password.text;
-                    const String apiUrl = "http://10.0.2.2:5000/api/users/login";
+                    const String apiUrl = "http://localhost:5000/api/users/login";
                     final response = await http.post(
                     Uri.parse(apiUrl),
                     headers: {"Content-Type": "application/json"},
@@ -182,34 +181,7 @@ class _SignInPageState extends State<SignInPage> {
                       );
                     },
                     child: const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        color: Color(0xFF56021F),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),        
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Are you a dealer? ",
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SignInDealer(),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'Dealer Login',
+                      'Sign Up As A Dealer',
                       style: TextStyle(
                         color: Color(0xFF56021F),
                         fontWeight: FontWeight.bold,
