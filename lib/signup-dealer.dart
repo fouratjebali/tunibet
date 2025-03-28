@@ -13,7 +13,7 @@ class _SignUpPageState extends State<SignUpDealer> {
   late final TextEditingController _email;
   late final TextEditingController _password;
   late final TextEditingController _phone;
-  late final TextEditingController _companyname;
+  late final TextEditingController _dealername;
 
 
   @override
@@ -21,7 +21,7 @@ class _SignUpPageState extends State<SignUpDealer> {
     super.initState();
     _email = TextEditingController();
     _password = TextEditingController();
-    _companyname = TextEditingController();
+    _dealername = TextEditingController();
     _phone = TextEditingController();
   }
 
@@ -30,7 +30,7 @@ class _SignUpPageState extends State<SignUpDealer> {
     _email.dispose();
     _password.dispose();
     _phone.dispose();
-    _companyname.dispose();
+    _dealername.dispose();
     super.dispose();
   }
 
@@ -69,11 +69,11 @@ class _SignUpPageState extends State<SignUpDealer> {
               ),
               const SizedBox(height: 50),
               TextField(
-                controller: _companyname,
+                controller: _dealername,
                 decoration: InputDecoration(
                   fillColor: Colors.grey[100],
                   filled: true,
-                  hintText: 'Company Name',
+                  hintText: 'Dealer Name',
                   prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -116,7 +116,7 @@ class _SignUpPageState extends State<SignUpDealer> {
                 decoration: InputDecoration(
                   fillColor: Colors.grey[100],
                   filled: true,
-                  hintText: 'Company Mobile Phone Number',
+                  hintText: 'Dealer Mobile Phone Number',
                   prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -139,15 +139,15 @@ class _SignUpPageState extends State<SignUpDealer> {
                     final email = _email.text;
                     final password = _password.text;
                     final phone = _phone.text;
-                    final name = _companyname.text;
+                    final name = _dealername.text;
                     
-                    const String apiUrl = "http://localhost:5000/api/users/register";
+                    const String apiUrl = "http://10.0.2.2:5000:5000/api/users/register";
 
                     final response = await http.post(
                       Uri.parse(apiUrl),
                       headers: {"Content-Type": "application/json"},
                       body: jsonEncode({
-                        "fullName": name,
+                        "dealerName": name,
                         "email": email,
                         "password": password,
                         "phoneNumber": phone,
@@ -156,14 +156,14 @@ class _SignUpPageState extends State<SignUpDealer> {
 
                     if (response.statusCode == 201) {
                       final responseData = jsonDecode(response.body);
-                      print("User Created: ${responseData['user']}");
+                      print("Dealer Created: ${responseData['user']}");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("User created successfully!")),
+                        SnackBar(content: Text("Dealer created successfully!")),
                       );
                     } else {
                       print("Error: ${response.body}");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Failed to create user")),
+                        SnackBar(content: Text("Failed to create Dealer")),
                       );
                     }
                   },

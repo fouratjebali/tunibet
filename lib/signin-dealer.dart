@@ -74,7 +74,7 @@ class _SignInPageState extends State<SignInDealer> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.grey[100],
-                  hintText: 'Company Email',
+                  hintText: 'Dealer Email',
                   prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -124,7 +124,7 @@ class _SignInPageState extends State<SignInDealer> {
                   onPressed: () async {
                     final email = _email.text;
                     final password = _password.text;
-                    const String apiUrl = "http://localhost:5000/api/users/login";
+                    const String apiUrl = "http://10.0.2.2:5000/api/users/login";
                     final response = await http.post(
                     Uri.parse(apiUrl),
                     headers: {"Content-Type": "application/json"},
@@ -140,7 +140,7 @@ class _SignInPageState extends State<SignInDealer> {
                       // Save token
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       await prefs.setString("token", data["token"]);
-                      await prefs.setString("userEmail", data["user"]["email"]);
+                      await prefs.setString("dealerEmail", data["dealer"]["email"]);
 
                       // Navigate to main page
                       Navigator.pushReplacementNamed(context, "/home");// MAIN
