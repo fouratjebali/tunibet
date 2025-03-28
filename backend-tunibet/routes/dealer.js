@@ -22,6 +22,10 @@ router.post("/register", async (req, res) => {
     if (existingDealer.rows.length > 0) {
         return res.status(400).json({ error: "Email or phone number already exists" });
     }
+    const empty = await pool.query("SELECT * FROM DEALERS;");
+    if (empty.rows.length === 0){
+        const reset_sequence = await pool.query("ALTER SEQUENCE dealers_id_seq RESTART WITH 1;");
+    }
 
     try {
         const salt = await bcrypt.genSalt(10);
@@ -49,21 +53,18 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({ message: "Email and password are required" });
         }
 
-        // Check if user exists
         const dealer = await pool.query("SELECT * FROM dealers WHERE email = $1", [email]);
 
         if (dealer.rows.length === 0) {
             return res.status(401).json({ message: "Invalid email or password" });
         }
 
-        // Verify password
         const validPassword = await bcrypt.compare(password, dealer.rows[0].password);
 
         if (!validPassword) {
             return res.status(401).json({ message: "Invalid password" });
         }
 
-        // Generate JWT token
         const token = jwt.sign(
             { id: dealer.rows[0].dealer_id, email: dealer.rows[0].email },
             JWT_SECRET,
