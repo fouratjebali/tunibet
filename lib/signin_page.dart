@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tunibet/signin-dealer.dart';
 
 import 'signup-page.dart';
+import 'home_page.dart';
 
 
 class SignInPage extends StatefulWidget {
@@ -142,9 +143,15 @@ class _SignInPageState extends State<SignInPage> {
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       await prefs.setString("token", data["token"]);
                       await prefs.setString("userEmail", data["user"]["email"]);
+                      await prefs.setInt("userId", int.parse(data["user"]["id"].toString()));
+
+
+                       if (!mounted) return;
 
                       // Navigate to main page
-                      Navigator.pushReplacementNamed(context, "/home");// MAIN
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomePage()));
                     } else {
                       // Show error message
                       ScaffoldMessenger.of(context).showSnackBar(

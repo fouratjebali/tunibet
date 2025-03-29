@@ -245,12 +245,15 @@ class _CarDetailPageState extends State<CarDetailPage> {
                   
                   const SizedBox(height: 32),
                   
-                  // Contact Button
+                  
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        
+
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF56021F),
                         shape: RoundedRectangleBorder(
@@ -258,7 +261,7 @@ class _CarDetailPageState extends State<CarDetailPage> {
                         ),
                       ),
                       child: const Text(
-                        'Contact Seller',
+                        'Place your bet',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,

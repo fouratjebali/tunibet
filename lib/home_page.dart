@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'car_model.dart'; 
 import 'car_detail_page.dart';
+import 'user_helper.dart';
+import 'profile_page.dart';
 
 const String baseUrl = 'http://10.0.2.2:5000/api'; 
 
@@ -156,12 +158,27 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () {},
+          icon: const Icon(Icons.person_outline, color: Colors.black),
+          onPressed: () async {
+            final userId = await UserHelper.getUserId();
+            
+            if (userId != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(userId: userId),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('User not authenticated')),
+              );
+            }
+          },
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_outline, color: Colors.black),
+            icon: const Icon(Icons.menu, color: Colors.black),
             onPressed: () {},
           ),
         ],

@@ -79,4 +79,41 @@ router.post("/login", async (req, res) => {
     }
 });
 
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+      // Query to get user data and profile image in a single request
+      const result = await pool.query(`
+        SELECT 
+          u.id,
+          u.email,
+          u.full_name,
+          ui.image_url
+        FROM 
+          users u
+        LEFT JOIN 
+          userimage ui ON u.id = ui.id
+        WHERE 
+          u.id = $1
+      `, [id]);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      const userData = result.rows[0];
+      
+      res.json({
+        id: userData.user_id,
+        email: userData.email,
+        fullName: userData.full_name,
+        profileImage: userData.image_url || null
+      });
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      res.status(500).json({ error: 'Failed to fetch user profile' });
+    }
+  });
+
 module.exports = router;

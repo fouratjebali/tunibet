@@ -34,7 +34,7 @@ class _LandingPageState extends State<LandingPage> {
         // Otherwise, go to SignInPage
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),//SignInPage
+          MaterialPageRoute(builder: (context) => const SignInPage()),//SignInPage
         );
       }
     });

@@ -143,7 +143,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     final phone = _phone.text;
                     final name = _name.text;
                     
-                    const String apiUrl = "http://10.0.2.2:5000/api/users/register";
+                    const String apiUrl = "http://192.168.1.78:5000/api/users/register";
 
                     final response = await http.post(
                       Uri.parse(apiUrl),
