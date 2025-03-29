@@ -1,10 +1,11 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const userRegistre = require("./routes/user");
 const userLogin = require("./routes/user");
 const dealerRegistre = require("./routes/dealer");
 const dealerLogin = require("./routes/dealer");
-const jwt = require("jsonwebtoken");
+const cars = require("./routes/car");
 
 const app = express();
 
@@ -19,7 +20,7 @@ app.use("/api/users", userRegistre);
 app.use("/api/users", userLogin);
 app.use("/api/dealers", dealerRegistre);
 app.use("/api/dealers", dealerLogin);
-
+app.use("/api/cars",cars);
 app.get("/", (req, res) => {
     res.send("Welcome to the API");
 });

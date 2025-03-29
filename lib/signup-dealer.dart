@@ -141,7 +141,7 @@ class _SignUpPageState extends State<SignUpDealer> {
                     final phone = _phone.text;
                     final name = _dealername.text;
                     
-                    const String apiUrl = "http://10.0.2.2:5000:5000/api/users/register";
+                    const String apiUrl = "http://10.0.2.2:5000/api/users/register";
 
                     final response = await http.post(
                       Uri.parse(apiUrl),
