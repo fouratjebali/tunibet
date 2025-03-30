@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tunibet/signup-dealer.dart';
 
 import 'signup-page.dart';
 import 'home_page.dart';
@@ -181,12 +182,12 @@ class _SignInPageState extends State<SignInDealer> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const SignUpPage(),
+                          builder: (context) => const SignUpDealer(),
                         ),
                       );
                     },
                     child: const Text(
-                      'Sign Up As A Dealer',
+                      'Sign up as a Dealer',
                       style: TextStyle(
                         color: Color(0xFF56021F),
                         fontWeight: FontWeight.bold,

@@ -81,7 +81,6 @@ router.post("/login", async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
-    console.log(id);
     try {
       const result = await pool.query(`
         SELECT 
@@ -107,7 +106,7 @@ router.get('/:id', async (req, res) => {
         id: userData.user_id,
         email: userData.email,
         fullName: userData.full_name,
-        profileImage: userData.image_url || null
+        profileImage: userData.image_url ? `http://10.0.2.2:5000${userData.image_url}` : null
       });
     } catch (error) {
       console.error('Error fetching user profile:', error);

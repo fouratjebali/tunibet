@@ -13,6 +13,7 @@ dependencies:
     sdk: flutter
   font_awesome_flutter: ^10.7.0
   http: ^0.13.6
+  image_picker: ^1.0.4
   
 
   english_words: ^4.0.0

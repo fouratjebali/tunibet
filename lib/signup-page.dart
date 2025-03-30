@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'signin_page.dart';
 import 'signup-dealer.dart';
@@ -16,6 +19,8 @@ class _SignUpPageState extends State<SignUpPage> {
   late final TextEditingController _password;
   late final TextEditingController _phone;
   late final TextEditingController _name;
+  File? _selectedImage;
+  String? _userId;
 
 
   @override
@@ -34,6 +39,71 @@ class _SignUpPageState extends State<SignUpPage> {
     _phone.dispose();
     _name.dispose();
     super.dispose();
+  }
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+  Future<void> _uploadProfilePicture() async {
+    if (_selectedImage == null || _userId == null) return;
+
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse('http://10.0.2.2:5000/api/users/upload-profile'),
+    );
+
+    request.fields['id'] = _userId!;
+    request.files.add(await http.MultipartFile.fromPath('image', _selectedImage!.path));
+
+    final response = await request.send();
+
+    if (response.statusCode == 201) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile picture uploaded successfully!')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SignInPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to upload image')),
+      );
+    }
+  }
+  Future<void> _onSignUpSuccess(String userId) async {
+    setState(() {
+      _userId = userId;
+    });
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Upload Profile Picture'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _selectedImage != null
+                ? Image.file(_selectedImage!, height: 100, width: 100)
+                : const Icon(Icons.person, size: 100),
+            TextButton(
+              onPressed: _pickImage,
+              child: const Text('Choose Image'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: _uploadProfilePicture,
+            child: const Text('Upload'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -143,7 +213,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     final phone = _phone.text;
                     final name = _name.text;
                     
-                    const String apiUrl = "http://192.168.1.78:5000/api/users/register";
+                    const String apiUrl = "http://10.0.2.2:5000/api/users/register";
 
                     final response = await http.post(
                       Uri.parse(apiUrl),
@@ -158,9 +228,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
                     if (response.statusCode == 201) {
                       final responseData = jsonDecode(response.body);
+                       _onSignUpSuccess(responseData['user']['id'].toString());
                       print("User Created: ${responseData['user']}");
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text("User created successfully!")),
+                         
                       );
                     } else {
                       print("Error: ${response.body}");
@@ -231,7 +303,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Are you a dealer?",
+                    "Are you a dealer? ",
                     style: TextStyle(color: Colors.black54),
                   ),
                   GestureDetector(
@@ -244,7 +316,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       );
                     },
                     child: const Text(
-                      'Sign up As A Dealer',
+                      'Sign up as a Dealer',
                       style: TextStyle(
                         color: Color(0xFF56021F),
                         fontWeight: FontWeight.bold,
@@ -258,7 +330,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Already have an account?",
+                    "Already have an account? ",
                     style: TextStyle(color: Colors.black54),
                   ),
                   GestureDetector(
@@ -271,7 +343,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       );
                     },
                     child: const Text(
-                      'login',
+                      'Login',
                       style: TextStyle(
                         color: Color(0xFF56021F),
                         fontWeight: FontWeight.bold,

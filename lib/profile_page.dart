@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:tunibet/edit_profile_page.dart';
 import 'signin_page.dart';
 import 'user_helper.dart';
 const String baseUrl = 'http://10.0.2.2:5000/api'; 
@@ -157,13 +158,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 
                 const SizedBox(height: 16),
                 
-                // Edit profile button
                 ElevatedButton(
-                  onPressed: () {
-                    // Navigate to edit profile page
+                  onPressed: () async {
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditProfilePage(userId: widget.userId!),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: const Color(0xFF56021F),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -225,14 +231,11 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               TextButton(
                 onPressed: () async {
-                  // Perform logout using UserHelper
                   await UserHelper.logout();
                   
-                  // Close dialog and navigate to login page
                   if (!context.mounted) return;
                   Navigator.of(context).popUntil((route) => route.isFirst);
                   
-                  // Replace the current route with the login page
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const SignInPage()),
