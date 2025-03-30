@@ -1,12 +1,11 @@
-import 'dart:ffi';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserHelper {
   // Get the current user ID
   static Future<String?> getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt("userId").toString();
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getInt("userId");
+  return userId?.toString();
   }
   
   // Get the current user email

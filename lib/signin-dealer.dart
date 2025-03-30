@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'signup-page.dart';
+import 'home_page.dart';
 
 
 class SignInDealer extends StatefulWidget {
@@ -124,7 +125,7 @@ class _SignInPageState extends State<SignInDealer> {
                   onPressed: () async {
                     final email = _email.text;
                     final password = _password.text;
-                    const String apiUrl = "http://10.0.2.2:5000/api/users/login";
+                    const String apiUrl = "http://10.0.2.2:5000/api/dealers/login";
                     final response = await http.post(
                     Uri.parse(apiUrl),
                     headers: {"Content-Type": "application/json"},
@@ -140,12 +141,16 @@ class _SignInPageState extends State<SignInDealer> {
                       // Save token
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       await prefs.setString("token", data["token"]);
-                      await prefs.setString("dealerEmail", data["dealer"]["email"]);
+                      await prefs.setString("userEmail", data["dealer"]["email"]);
+                      await prefs.setInt("userId", data["dealer"]["dealer_id"]);
+                      await prefs.setString("userType", "dealer");
 
-                      // Navigate to main page
-                      Navigator.pushReplacementNamed(context, "/home");// MAIN
+                      if (!mounted) return;
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomePage()));
                     } else {
-                      // Show error message
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(data["message"])),
                       );

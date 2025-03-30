@@ -28,16 +28,16 @@ class User {
   }
 }
 
-class ProfilePage extends StatefulWidget {
+class DealerProfilePage extends StatefulWidget {
   final String? userId;
 
-  const ProfilePage({Key? key, required this.userId}) : super(key: key);
+  const DealerProfilePage({Key? key, required this.userId}) : super(key: key);
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<DealerProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<DealerProfilePage> {
   bool _isLoading = true;
   User? _user;
   String? _error;
@@ -49,35 +49,42 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _fetchUserProfile() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+  setState(() {
+    _isLoading = true;
+    _error = null;
+  });
 
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/users/${widget.userId}'),
-      );
+  try {
+    final response = await http.get(
+      Uri.parse('$baseUrl/dealers/${widget.userId}'),
+    );
 
-      if (response.statusCode == 200) {
-        final userData = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      final userData = jsonDecode(response.body);
+      if (mounted) {
         setState(() {
           _user = User.fromJson(userData);
           _isLoading = false;
         });
-      } else {
+      }
+    } else {
+      if (mounted) {
         setState(() {
           _error = 'Failed to load user profile: ${response.statusCode}';
           _isLoading = false;
         });
       }
-    } catch (e) {
+    }
+  } catch (e) {
+    if (mounted) {
       setState(() {
         _error = 'Error: $e';
         _isLoading = false;
       });
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

@@ -21,6 +21,7 @@ app.use("/api/users", userLogin);
 app.use("/api/dealers", dealerRegistre);
 app.use("/api/dealers", dealerLogin);
 app.use("/api/cars",cars);
+
 app.get("/", (req, res) => {
     res.send("Welcome to the API");
 });

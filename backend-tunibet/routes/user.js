@@ -81,9 +81,8 @@ router.post("/login", async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
-    
+    console.log(id);
     try {
-      // Query to get user data and profile image in a single request
       const result = await pool.query(`
         SELECT 
           u.id,

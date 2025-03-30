@@ -77,6 +77,40 @@ router.post("/login", async (req, res) => {
     }
 });
 
-
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+      const result = await pool.query(`
+        SELECT 
+          u.dealer_id,
+          u.email,
+          u.dealer_name,
+          ui.image_url
+        FROM 
+          dealers u
+        LEFT JOIN 
+          dealerimage ui ON u.dealer_id = ui.dealer_id
+        WHERE 
+          u.dealer_id = $1
+      `, [id]);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Dealer not found' });
+      }
+      
+      const userData = result.rows[0];
+      
+      res.json({
+        id: userData.dealer_id,
+        email: userData.email,
+        fullName: userData.dealer_name,
+        profileImage: userData.image_url || null
+      });
+    } catch (error) {
+      console.error('Error fetching dealer profile:', error);
+      res.status(500).json({ error: 'Failed to fetch dealer profile' });
+    }
+  });
 
 module.exports = router;

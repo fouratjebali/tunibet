@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tunibet/signin-dealer.dart';
 import 'dart:convert';
 import 'signup-page.dart';
 import 'package:http/http.dart' as http;
@@ -141,7 +142,7 @@ class _SignUpPageState extends State<SignUpDealer> {
                     final phone = _phone.text;
                     final name = _dealername.text;
                     
-                    const String apiUrl = "http://10.0.2.2:5000/api/users/register";
+                    const String apiUrl = "http://10.0.2.2:5000/api/dealers/register";
 
                     final response = await http.post(
                       Uri.parse(apiUrl),
@@ -157,8 +158,14 @@ class _SignUpPageState extends State<SignUpDealer> {
                     if (response.statusCode == 201) {
                       final responseData = jsonDecode(response.body);
                       print("Dealer Created: ${responseData['user']}");
+
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Dealer created successfully!")),
+                        const SnackBar(content: Text("Dealer created successfully!")),
+                      );
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SignInDealer()),
                       );
                     } else {
                       print("Error: ${response.body}");

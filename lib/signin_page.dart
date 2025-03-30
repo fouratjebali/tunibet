@@ -143,17 +143,16 @@ class _SignInPageState extends State<SignInPage> {
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       await prefs.setString("token", data["token"]);
                       await prefs.setString("userEmail", data["user"]["email"]);
-                      await prefs.setInt("userId", int.parse(data["user"]["id"].toString()));
+                      await prefs.setInt("userId", data["user"]["id"]);
+                      await prefs.setString("userType", "user");
 
 
                        if (!mounted) return;
 
-                      // Navigate to main page
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => const HomePage()));
                     } else {
-                      // Show error message
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(data["message"])),
                       );

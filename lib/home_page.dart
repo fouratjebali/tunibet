@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'car_model.dart'; 
 import 'car_detail_page.dart';
 import 'user_helper.dart';
 import 'profile_page.dart';
+import 'dealer_profile_page.dart';
 
 const String baseUrl = 'http://10.0.2.2:5000/api'; 
 
@@ -160,16 +162,23 @@ class _HomePageState extends State<HomePage> {
         leading: IconButton(
           icon: const Icon(Icons.person_outline, color: Colors.black),
           onPressed: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
             final userId = await UserHelper.getUserId();
-            
-            if (userId != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProfilePage(userId: userId),
-                ),
-              );
-            } else {
+            final String? userType = prefs.getString("userType");
+            if(!mounted) return;
+            if (userId != null && userId.isNotEmpty){
+              if (userType == "user") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage(userId: userId)),
+                );
+            }else if (userType == "dealer") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DealerProfilePage(userId: userId)),
+                );
+            }
+            }else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('User not authenticated')),
               );
