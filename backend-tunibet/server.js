@@ -8,7 +8,8 @@ const dealerLogin = require("./routes/dealer");
 const cars = require("./routes/car");
 const uploadProfile = require("./routes/uploadProfile");
 const uploadDealerProfile = require("./routes/uploadDealerProfile");
-const editUser = require("./routes/uploadProfile");
+const editUser = require("./routes/user");
+const editDealer = require("./routes/dealer");
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/users", uploadProfile);
 app.use("/api/dealers",uploadDealerProfile);
 app.use("/api/users", editUser);
+app.use("/api/dealers",editDealer);
 
 app.get("/", (req, res) => {
     res.send("Welcome to the API");

@@ -117,6 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildProfileContent() {
+    final String type = "user";
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -164,7 +165,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => EditProfilePage(userId: widget.userId!),
+                        builder: (context) => EditProfilePage(userId: widget.userId!, type: type,),
                       ),
                     );
                   },
@@ -184,11 +185,11 @@ class _ProfilePageState extends State<ProfilePage> {
           
           // Menu items
           _buildMenuItem(Icons.favorite, 'Favourites'),
-          _buildMenuItem(Icons.download, 'Downloads'),
+          _buildMenuItem(Icons.download, 'Saved Cars'),
           const Divider(),
           _buildMenuItem(Icons.language, 'Languages'),
           _buildMenuItem(Icons.location_on, 'Location'),
-          _buildMenuItem(Icons.subscriptions, 'Subscription'),
+          _buildMenuItem(Icons.subscriptions, 'Edit Preferences'),
           _buildMenuItem(Icons.display_settings, 'Display'),
           const Divider(),
           _buildMenuItem(Icons.delete, 'Clear Cache'),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'signin_page.dart';
 import 'user_helper.dart';
+import 'edit_profile_page.dart';
 const String baseUrl = 'http://10.0.2.2:5000/api'; 
 
 class User {
@@ -123,6 +124,7 @@ class _ProfilePageState extends State<DealerProfilePage> {
   }
 
   Widget _buildProfileContent() {
+    final String type = "dealer";
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -166,11 +168,17 @@ class _ProfilePageState extends State<DealerProfilePage> {
                 
                 // Edit profile button
                 ElevatedButton(
-                  onPressed: () {
-                    // Navigate to edit profile page
+                  onPressed: () async {
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditProfilePage(userId: widget.userId!, type: type,),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: const Color(0xFF56021F),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),

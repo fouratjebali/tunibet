@@ -8,8 +8,13 @@ const String baseUrl = 'http://10.0.2.2:5000/api';
 
 class EditProfilePage extends StatefulWidget {
   final String userId;
+  final String type;
 
-  const EditProfilePage({Key? key, required this.userId}) : super(key: key);
+   const EditProfilePage({
+    Key? key,
+    required this.userId,
+    required this.type, // Add required type parameter
+  }) : super(key: key);
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -73,58 +78,99 @@ class _EditProfilePageState extends State<EditProfilePage> {
     setState(() {
       _isLoading = true;
     });
+    if (widget.type == "user"){
+      final request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('$baseUrl/users/${widget.userId}'),
+      );
 
-    final request = http.MultipartRequest(
-      'PUT',
-      Uri.parse('$baseUrl/users/${widget.userId}'),
-    );
+      // Add fields to request
+      request.fields['fullName'] = _fullNameController.text;
+      request.fields['email'] = _emailController.text;
+      request.fields['password'] = _passwordController.text;
+      request.fields['phoneNumber'] = _phoneController.text;
 
-    // Add fields to request
-    request.fields['fullName'] = _fullNameController.text;
-    request.fields['email'] = _emailController.text;
-    request.fields['password'] = _passwordController.text;
-    request.fields['phoneNumber'] = _phoneController.text;
-
-    // Add profile image if available
-    if (_profileImage != null) {
-      request.files.add(await http.MultipartFile.fromPath(
-        'profileImage',
-        _profileImage!.path,
-      ));
-    }
-
-    try {
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
-        Navigator.pop(context, 'Profile updated successfully');
-        Navigator.of(context).pop();
-      } else {
-        _showErrorDialog('Failed to update profile');
+      // Add profile image if available
+      if (_profileImage != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'profileImage',
+          _profileImage!.path,
+        ));
       }
-    } catch (e) {
-      _showErrorDialog('Error: $e');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+
+      try {
+        final response = await request.send();
+
+        if (response.statusCode == 200) {
+          Navigator.pop(context, 'Profile updated successfully');
+          Navigator.of(context).pop();
+        } else {
+          _showErrorDialog('Failed to update profile');
+        }
+      } catch (e) {
+        _showErrorDialog('Error: $e');
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+  }else if(widget.type == "dealer"){
+      final request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('$baseUrl/dealers/${widget.userId}'),
+      );
+
+      // Add fields to request
+      request.fields['fullName'] = _fullNameController.text;
+      request.fields['email'] = _emailController.text;
+      request.fields['password'] = _passwordController.text;
+      request.fields['phoneNumber'] = _phoneController.text;
+
+      // Add profile image if available
+      if (_profileImage != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'profileImage',
+          _profileImage!.path,
+        ));
+      }
+
+      try {
+        final response = await request.send();
+
+        if (response.statusCode == 200) {
+          Navigator.pop(context, 'Profile updated successfully');
+          Navigator.of(context).pop();
+        } else {
+          _showErrorDialog('Failed to update profile');
+        }
+      } catch (e) {
+        _showErrorDialog('Error: $e');
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+  }
   }
 
-  Widget _buildTextField(TextEditingController controller, String label,
-      {bool obscure = false}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: TextField(
-        controller: controller,
-        obscureText: obscure,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(),
-        ),
+  Widget _buildTextField(TextEditingController controller, String hintText, {bool obscure = false}) {
+  return TextField(
+    controller: controller,
+    obscureText: obscure,
+    decoration: InputDecoration(
+      hintText: hintText,
+      hintStyle: TextStyle(color: Colors.grey[600]),
+      filled: true,
+      fillColor: Colors.grey[200],
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
       ),
-    );
-  }
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    ),
+    style: TextStyle(fontSize: 16),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -166,8 +212,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     const SizedBox(height: 16),
                     _buildTextField(_fullNameController, 'Full Name'),
+                    const SizedBox(height: 16),
                     _buildTextField(_emailController, 'Email'),
+                    const SizedBox(height: 16),
                     _buildTextField(_passwordController, 'Password', obscure: true),
+                    const SizedBox(height: 16),
                     _buildTextField(_phoneController, 'Phone Number'),
                     const SizedBox(height: 16),
                     SizedBox(
