@@ -14,6 +14,7 @@ class Car {
   final String? description;
   final String? location;
   final String imageUrl; 
+  final bool isSold;
   final List<String> images;
 
   Car({
@@ -31,6 +32,7 @@ class Car {
     this.condition,
     this.description,
     this.location,
+    required this.isSold,
     required this.imageUrl,
     required this.images,
   });
@@ -44,11 +46,11 @@ class Car {
     String mainImage = json['image_url'] ?? (imagesList.isNotEmpty ? imagesList[0] : '');
 
     return Car(
-      id: json['id'].toString(),
+      id: json['id'].toString() ?? '',
       make: json['make'],
       model: json['model'],
-      year: json['year'],
-      price: double.parse(json['price'].toString()),
+      year: json['year'] ?? 0,
+      price: double.parse(json['price'].toString()) ?? 0.0,
       mileage: json['mileage'],
       fuelType: json['fuel_type'],
       transmission: json['transmission'],
@@ -59,6 +61,7 @@ class Car {
       description: json['description'],
       location: json['location'],
       imageUrl: mainImage,
+      isSold: json['is_sold'] ?? false,
       images: imagesList,
     );
   }

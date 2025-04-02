@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tunibet/signin-dealer.dart';
-import 'package:tunibet/signin_page.dart';
 import 'dart:convert';
 import 'signup-page.dart';
 import 'package:http/http.dart' as http;
@@ -257,7 +256,7 @@ class _SignUpPageState extends State<SignUpDealer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Are you a simple user? ",
+                    "Are you a normal user? ",
                     style: TextStyle(color: Colors.black54),
                   ),
                   GestureDetector(

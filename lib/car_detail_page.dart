@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'car_model.dart';
+import 'place_bet_page.dart';
 
 class CarDetailPage extends StatefulWidget {
   final Car car;
@@ -250,8 +251,12 @@ class _CarDetailPageState extends State<CarDetailPage> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        
+                      onPressed: () {
+                        Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => PlaceBetPage(car: widget.car),
+                        ),
+                      );
 
                       },
                       style: ElevatedButton.styleFrom(

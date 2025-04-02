@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tunibet/dealer_home_page.dart';
 import 'package:tunibet/signup-dealer.dart';
+import 'package:tunibet/dealer_home_page.dart';
 
 import 'signup-page.dart';
 import 'home_page.dart';
@@ -150,7 +152,12 @@ class _SignInPageState extends State<SignInDealer> {
 
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => const HomePage()));
+                        MaterialPageRoute(
+                          builder: (context) => DealerHomePage(
+                            dealerId: data["dealer"]["dealer_id"].toString(),
+                          ),
+                        ),
+                      );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(data["message"])),

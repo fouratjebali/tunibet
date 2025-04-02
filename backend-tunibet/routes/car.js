@@ -293,5 +293,7 @@ async function formatCarWithImages(car) {
       res.status(500).json({ error: 'Failed to filter cars' });
     }
   });
+
+  
   
   module.exports = router;

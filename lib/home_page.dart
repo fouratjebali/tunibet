@@ -167,18 +167,13 @@ class _HomePageState extends State<HomePage> {
             final String? userType = prefs.getString("userType");
             if(!mounted) return;
             if (userId != null && userId.isNotEmpty){
-              if (userType == "user") {
+              
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ProfilePage(userId: userId)),
                 );
-            }else if (userType == "dealer") {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => DealerProfilePage(userId: userId)),
-                );
-            }
-            }else {
+            
+          }else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('User not authenticated')),
               );
@@ -187,7 +182,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black),
+            icon: const Icon(Icons.notifications, color: Colors.black),
             onPressed: () {},
           ),
         ],
@@ -230,35 +225,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              
               const SizedBox(height: 20),
-              
-              // Sell Your Car Button
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF56021F),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Sell your car',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 20),
-              
-              // Recommended Text
               Row(
                 children: [
                   Text(

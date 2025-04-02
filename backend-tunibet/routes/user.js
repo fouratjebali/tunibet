@@ -132,12 +132,13 @@ router.get('/:id', async (req, res) => {
     const profileImage = req.file ? `/uploads/${req.file.filename}` : null;
     console.log(id);
     try {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(trimmedPassword, salt);
       const result = await pool.query(
         `UPDATE users SET full_name = $1, email = $2, password = $3, phone_number = $4 WHERE id = $5 RETURNING *`,
-        [fullName, email, password, phoneNumber, id]
+        [fullName, email, hashedPassword, phoneNumber, id]
       );
   
-      // If the user has updated their profile image
       if (profileImage) {
         await pool.query(
           `UPDATE userimage SET image_url = $1 WHERE id = $2`,

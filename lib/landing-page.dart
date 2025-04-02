@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tunibet/dealer_home_page.dart';
+import 'package:tunibet/signin-dealer.dart';
 import 'signin_page.dart';
 import 'home_page.dart'; // Import your home page
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,24 +22,30 @@ class _LandingPageState extends State<LandingPage> {
 
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString("token"); // Retrieve saved token
+    final String? userType = prefs.getString('userType');
+    final int? userId = prefs.getInt('userId');
 
-    // Redirect after 5 seconds
-    Future.delayed(const Duration(seconds: 5), () {
-      if (token != null && token.isNotEmpty) {
-        // If user is logged in, go to HomePage
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-      } else {
-        // Otherwise, go to SignInPage
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const SignInPage()),//SignInPage
-        );
-      }
-    });
+    if (userType == 'user' && userId != null) {
+      // Navigate to HomePage for users
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else if (userType == 'dealer' && userId != null) {
+      // Navigate to DealerHomePage for dealers
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DealerHomePage(dealerId: userId.toString()),
+        ),
+      );
+    } else {
+      // No one is logged in, navigate to login page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SignInDealer()),
+      );
+    }
   }
 
   @override

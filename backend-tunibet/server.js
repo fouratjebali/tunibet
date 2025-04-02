@@ -10,12 +10,14 @@ const uploadProfile = require("./routes/uploadProfile");
 const uploadDealerProfile = require("./routes/uploadDealerProfile");
 const editUser = require("./routes/user");
 const editDealer = require("./routes/dealer");
+const bet = require('./routes/bet');
+const dealercars = require("./routes/dealercars");
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
-
+app.use(express.urlencoded({ extended: true }));
 
 
 
@@ -30,9 +32,12 @@ app.use("/api/users", uploadProfile);
 app.use("/api/dealers",uploadDealerProfile);
 app.use("/api/users", editUser);
 app.use("/api/dealers",editDealer);
+app.use('/api/bets', bet);
+app.use("/api/dealercars", dealercars);
+
 
 app.get("/", (req, res) => {
-    res.send("Welcome to the API");
+    res.send("test api");
 });
 
 

@@ -32,7 +32,7 @@ class User {
 class DealerProfilePage extends StatefulWidget {
   final String? userId;
 
-  const DealerProfilePage({Key? key, required this.userId}) : super(key: key);
+  const DealerProfilePage({Key? key, required this.userId, required String dealerId}) : super(key: key);
 
   @override
   State<DealerProfilePage> createState() => _ProfilePageState();

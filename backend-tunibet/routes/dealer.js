@@ -132,12 +132,13 @@ router.get('/:id', async (req, res) => {
     const profileImage = req.file ? `/uploads/${req.file.filename}` : null;
     console.log(id);
     try {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
       const result = await pool.query(
         `UPDATE dealers SET dealer_name = $1, email = $2, password = $3, phone_number = $4 WHERE dealer_id = $5 RETURNING *`,
-        [fullName, email, password, phoneNumber, id]
+        [fullName, email, hashedPassword, phoneNumber, id]
       );
   
-      // If the user has updated their profile image
       if (profileImage) {
         await pool.query(
           `UPDATE dealerimage SET image_url = $1 WHERE dealer_id = $2`,
@@ -158,5 +159,7 @@ router.get('/:id', async (req, res) => {
       return res.status(500).json({ error: 'Failed to update Dealer profile' });
     }
   });
+
+  
 
 module.exports = router;

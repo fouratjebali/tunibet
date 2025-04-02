@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,7 +12,7 @@ class EditProfilePage extends StatefulWidget {
    const EditProfilePage({
     Key? key,
     required this.userId,
-    required this.type, // Add required type parameter
+    required this.type,
   }) : super(key: key);
 
   @override
@@ -84,13 +83,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         Uri.parse('$baseUrl/users/${widget.userId}'),
       );
 
-      // Add fields to request
       request.fields['fullName'] = _fullNameController.text;
       request.fields['email'] = _emailController.text;
       request.fields['password'] = _passwordController.text;
       request.fields['phoneNumber'] = _phoneController.text;
 
-      // Add profile image if available
       if (_profileImage != null) {
         request.files.add(await http.MultipartFile.fromPath(
           'profileImage',
@@ -120,13 +117,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         Uri.parse('$baseUrl/dealers/${widget.userId}'),
       );
 
-      // Add fields to request
       request.fields['fullName'] = _fullNameController.text;
       request.fields['email'] = _emailController.text;
       request.fields['password'] = _passwordController.text;
       request.fields['phoneNumber'] = _phoneController.text;
 
-      // Add profile image if available
       if (_profileImage != null) {
         request.files.add(await http.MultipartFile.fromPath(
           'profileImage',
@@ -224,7 +219,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       height: 50,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF56021F), // Dark red color
+                          backgroundColor: const Color(0xFF56021F),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
