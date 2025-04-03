@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tunibet/dealer_home_page.dart';
 import 'package:tunibet/signin-dealer.dart';
-import 'signin_page.dart';
-import 'home_page.dart'; // Import your home page
+import 'home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LandingPage extends StatefulWidget {

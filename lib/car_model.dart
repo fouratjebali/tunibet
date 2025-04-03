@@ -46,7 +46,7 @@ class Car {
     String mainImage = json['image_url'] ?? (imagesList.isNotEmpty ? imagesList[0] : '');
 
     return Car(
-      id: json['id'].toString() ?? '',
+      id: json['car_id'].toString() ?? '',
       make: json['make'],
       model: json['model'],
       year: json['year'] ?? 0,
@@ -61,7 +61,7 @@ class Car {
       description: json['description'],
       location: json['location'],
       imageUrl: mainImage,
-      isSold: json['is_sold'] ?? false,
+      isSold: json['is_sold'] ,
       images: imagesList,
     );
   }

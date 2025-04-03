@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tunibet/notification.dart';
 import 'car_model.dart'; 
 import 'car_detail_page.dart';
 import 'user_helper.dart';
 import 'profile_page.dart';
-import 'dealer_profile_page.dart';
 
 const String baseUrl = 'http://10.0.2.2:5000/api'; 
 
@@ -162,9 +161,7 @@ class _HomePageState extends State<HomePage> {
         leading: IconButton(
           icon: const Icon(Icons.person_outline, color: Colors.black),
           onPressed: () async {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
             final userId = await UserHelper.getUserId();
-            final String? userType = prefs.getString("userType");
             if(!mounted) return;
             if (userId != null && userId.isNotEmpty){
               
@@ -183,7 +180,15 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications, color: Colors.black),
-            onPressed: () {},
+            onPressed: () async {
+              final userId = await UserHelper.getUserId();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NotificationsPage(userId: userId ?? ''),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -299,12 +304,15 @@ class CarCard extends StatelessWidget {
     Key? key,
     required this.car,
   }) : super(key: key);
-
+  
   @override
   Widget build(BuildContext context) {
+    print('Car ID: ${car.id}'); 
+    print('Car Make: ${car.make}');
     return GestureDetector(
       onTap: () {
-        // Navigate to the car detail page when the card is tapped
+        print(car.id); 
+        print(car.make);
         Navigator.push(
           context,
           MaterialPageRoute(

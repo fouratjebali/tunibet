@@ -252,12 +252,34 @@ class _CarDetailPageState extends State<CarDetailPage> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => PlaceBetPage(car: widget.car),
-                        ),
-                      );
-
+                        print(widget.car.isSold);
+                        print(widget.car.id);
+                        if (widget.car.isSold == true) {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Car Sold'),
+                                content: const Text('This car has already been sold. You cannot place a bet.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(), 
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => PlaceBetPage(
+                                car: widget.car,
+                                isDealer: false,
+                              ),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF56021F),

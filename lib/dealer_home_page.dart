@@ -88,12 +88,7 @@ class _DealerHomePageState extends State<DealerHomePage> {
           IconButton(
             icon: const Icon(Icons.notifications, color: Colors.black),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NotificationsPage(dealerId: widget.dealerId),
-                ),
-              );
+              
             },
           ),
         ],
