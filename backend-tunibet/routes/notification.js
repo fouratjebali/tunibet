@@ -10,21 +10,7 @@ router.get('/', async (req, res) => {
   
     try {
       const result = await pool.query(
-        `
-        SELECT  
-          n.title, 
-          n.user_id,
-          n.message, 
-          d.phone_number,
-          n.created_at AS createdAt, 
-          c.car_id
-        FROM notifications n
-        LEFT JOIN accepted_bets ab ON n.user_id = ab.id
-        LEFT JOIN cars c ON c.car_id = ab.car_id
-        LEFT JOIN dealers d ON c.dealer_id = d.dealer_id
-        WHERE n.user_id = $1
-        ORDER BY n.created_at DESC
-        `,
+        "SELECT n.title, n.user_id, n.message, d.phone_number, n.created_at AS createdAt, c.car_id FROM notifications n LEFT JOIN accepted_bets ab ON n.user_id = ab.id LEFT JOIN cars c ON c.car_id = ab.car_id LEFT JOIN dealers d ON c.dealer_id = d.dealer_id WHERE n.user_id = $1 ORDER BY n.created_at DESC;",
         [user_id]
       );
   

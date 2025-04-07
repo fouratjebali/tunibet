@@ -112,33 +112,23 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
   
   try {
-    const result = await pool.query(`
-      SELECT 
-        u.dealer_id,
-        u.email,
-        u.dealer_name,
-        u.phone_number,
-        ui.image_url
-      FROM 
-        dealers u
-      LEFT JOIN 
-        dealerimage ui ON u.dealer_id = ui.dealer_id
-      WHERE 
-        u.dealer_id = $1
-    `, [id]);
+    const result = await pool.query("SELECT u.dealer_id, u.email, u.dealer_name, u.phone_number, ui.image_url FROM dealers u LEFT JOIN dealerimage ui ON u.dealer_id = ui.dealer_id WHERE u.dealer_id = $1;", [id]);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Dealer not found' });
     }
     
     const dealerData = result.rows[0];
-    
+    const baseUrl = 'http://10.0.2.2:5000'
+    const profileImage = dealerData.image_url
+      ? `${baseUrl}${dealerData.image_url}` 
+      : `${baseUrl}/uploads/default-profile.jpg`;
     res.json({
       id: dealerData.dealer_id,
       email: dealerData.email,
       dealerName: dealerData.dealer_name,
       phoneNumber: dealerData.phone_number,
-      profileImage: dealerData.image_url || null
+      profileImage: profileImage,
     });
   } catch (error) {
     console.error('Error fetching dealer profile:', error);
@@ -153,7 +143,7 @@ router.put('/:id', upload.single('profileImage'), async (req, res) => {
   const profileImage = req.file ? `/uploads/${req.file.filename}` : null;
 
   try {
-    let updateQuery = `UPDATE dealers SET dealer_name = $1, email = $2, phone_number = $3`;
+    let updateQuery = 'UPDATE dealers SET dealer_name = $1, email = $2, phone_number = $3';
     const queryParams = [dealerName, email, phoneNumber];
     
     // Only update password if provided
@@ -177,20 +167,20 @@ router.put('/:id', upload.single('profileImage'), async (req, res) => {
     if (profileImage) {
       // Check if image record exists
       const imageCheck = await pool.query(
-        `SELECT * FROM dealerimage WHERE dealer_id = $1`,
+        'SELECT * FROM dealerimage WHERE dealer_id = $1',
         [id]
       );
 
       if (imageCheck.rows.length > 0) {
         // Update existing image
         await pool.query(
-          `UPDATE dealerimage SET image_url = $1 WHERE dealer_id = $2`,
+          'UPDATE dealerimage SET image_url = $1 WHERE dealer_id = $2',
           [profileImage, id]
         );
       } else {
         // Insert new image record
         await pool.query(
-          `INSERT INTO dealerimage (dealer_id, image_url) VALUES ($1, $2)`,
+          'INSERT INTO dealerimage (dealer_id, image_url) VALUES ($1, $2)',
           [id, profileImage]
         );
       }

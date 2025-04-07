@@ -15,23 +15,18 @@ const editDealer = require("./routes/dealer");
 const bet = require("./routes/bet");
 const dealercars = require("./routes/dealercars");
 const notification = require("./routes/notification");
-const { Pool } = require("pg");
 const pool = require("./db");
 require("dotenv").config();
 
 const app = express();
 app.use(helmet());
 app.use(morgan("combined"));
-app.use(
-  cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(",") || "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+app.use(cors({
+  origin: '*', // Allow all origins
+}));
 
 
-app.use(express.json({ limit: "10kb" }));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -60,7 +55,7 @@ app.use("/api/users", uploadProfile);
 app.use("/api/dealers", uploadDealerProfile);
 app.use("/api/users", editUser);
 app.use("/api/dealers", editDealer);
-app.use('/api/bets', bet);
+app.use("/api/bets", bet);
 app.use("/api/dealercars", dealercars);
 app.use("/api/notifications", notification);
 
@@ -71,12 +66,12 @@ app.get("/", (req, res) => {
 
 
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal Server Error",
-      message: process.env.NODE_ENV === "development" ? err.message : undefined,
-    });
+  console.error(err.stack);
+  res.status(500).json({
+    error: "Internal Server Error",
+    message: process.env.NODE_ENV === "development" ? err.message : undefined
   });
+});
   
   // 404 handler
   app.use((req, res) => {
@@ -87,7 +82,7 @@ app.use((err, req, res, next) => {
 
   
 const PORT = 5000;
-app.listen(PORT, '0.0.0.0',() => {
+app.listen(PORT, "0.0.0.0",() => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
   

@@ -84,19 +84,7 @@ router.post("/login", async (req, res) => {
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
     try {
-      const result = await pool.query(`
-        SELECT 
-          u.id,
-          u.email,
-          u.full_name,
-          ui.image_url
-        FROM 
-          users u
-        LEFT JOIN 
-          userimage ui ON u.id = ui.id
-        WHERE 
-          u.id = $1
-      `, [id]);
+      const result = await pool.query("SELECT u.id, u.email, u.full_name, ui.image_url FROM users u LEFT JOIN userimage ui ON u.id = ui.id WHERE u.id = $1;", [id]);
       
       if (result.rows.length === 0) {
         return res.status(404).json({ error: 'User not found' });
@@ -135,13 +123,13 @@ router.get('/:id', async (req, res) => {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(trimmedPassword, salt);
       const result = await pool.query(
-        `UPDATE users SET full_name = $1, email = $2, password = $3, phone_number = $4 WHERE id = $5 RETURNING *`,
+        'UPDATE users SET full_name = $1, email = $2, password = $3, phone_number = $4 WHERE id = $5 RETURNING *',
         [fullName, email, hashedPassword, phoneNumber, id]
       );
   
       if (profileImage) {
         await pool.query(
-          `UPDATE userimage SET image_url = $1 WHERE id = $2`,
+          'UPDATE userimage SET image_url = $1 WHERE id = $2',
           [profileImage, id]
         );
       }

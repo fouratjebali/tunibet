@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:tunibet/edit_dealer_profile_page.dart';
 import 'signin_page.dart';
 import 'user_helper.dart';
 import 'edit_profile_page.dart';
@@ -21,18 +22,19 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'].toString(),
-      email: json['email'],
-      fullName: json['fullName'],
+      id: json['id']?.toString() ?? '',
+      email: json['email'] ?? 'email@example.com',
+      fullName: json['fullName'] ?? 'Dealer',
       profileImage: json['profileImage'],
     );
   }
 }
 
 class DealerProfilePage extends StatefulWidget {
-  final String? userId;
+  final String dealerId;
+  final bool isDealer;
 
-  const DealerProfilePage({Key? key, required this.userId, required String dealerId}) : super(key: key);
+  const DealerProfilePage({Key? key, required this.dealerId, required this.isDealer}) : super(key: key);
 
   @override
   State<DealerProfilePage> createState() => _ProfilePageState();
@@ -48,6 +50,16 @@ class _ProfilePageState extends State<DealerProfilePage> {
     super.initState();
     _fetchUserProfile();
   }
+  String getFullImageUrl(String? relativeUrl) {
+  const String baseUrl = 'http://10.0.2.2:5000'; // Replace with your backend's base URL
+  if (relativeUrl == null || relativeUrl.isEmpty) {
+    return '$baseUrl/uploads/default-profile.jpg'; // Default image
+  }
+  if (relativeUrl.startsWith('http')) {
+    return relativeUrl; // Already a full URL
+  }
+  return '$baseUrl$relativeUrl'; // Append base URL to relative path
+}
 
   Future<void> _fetchUserProfile() async {
   setState(() {
@@ -57,17 +69,19 @@ class _ProfilePageState extends State<DealerProfilePage> {
 
   try {
     final response = await http.get(
-      Uri.parse('$baseUrl/dealers/${widget.userId}'),
+      Uri.parse("$baseUrl/dealers/${widget.dealerId}"),
     );
-
+    print('Response status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
     if (response.statusCode == 200) {
       final userData = jsonDecode(response.body);
-      if (mounted) {
-        setState(() {
-          _user = User.fromJson(userData);
-          _isLoading = false;
+      print('Parsed user data: $userData');
+      setState(() {
+        _user = User.fromJson(userData);
+        print('User data: $_user');
+        _isLoading = false;
         });
-      }
+      
     } else {
       if (mounted) {
         setState(() {
@@ -137,10 +151,8 @@ class _ProfilePageState extends State<DealerProfilePage> {
                 CircleAvatar(
                   radius: 50,
                   backgroundColor: Colors.grey[200],
-                  backgroundImage: _user?.profileImage != null
-                      ? NetworkImage(_user!.profileImage!)
-                      : null,
-                  child: _user?.profileImage == null
+                  backgroundImage: NetworkImage(getFullImageUrl(_user?.profileImage)),
+                  child: _user?.profileImage == null || _user!.profileImage!.isEmpty
                       ? const Icon(Icons.person, size: 50, color: Colors.grey)
                       : null,
                 ),
@@ -148,7 +160,7 @@ class _ProfilePageState extends State<DealerProfilePage> {
                 
                 // User name
                 Text(
-                  _user?.fullName ?? 'User',
+                  _user?.fullName ?? 'Dealer',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -173,7 +185,7 @@ class _ProfilePageState extends State<DealerProfilePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => EditProfilePage(userId: widget.userId!, type: type,),
+                        builder: (context) => EditDealerProfilePage(dealerId: widget.dealerId ?? ''),
                       ),
                     );
                   },

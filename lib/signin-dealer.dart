@@ -146,6 +146,7 @@ class _SignInPageState extends State<SignInDealer> {
                       await prefs.setString("token", data["token"]);
                       await prefs.setString("userEmail", data["dealer"]["email"]);
                       await prefs.setInt("userId", data["dealer"]["dealer_id"]);
+                      print(data["dealer"]["dealer_id"]);
                       await prefs.setString("userType", "dealer");
 
                       if (!mounted) return;

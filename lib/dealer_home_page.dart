@@ -9,6 +9,7 @@ import 'place_bet_page.dart';
 
 class DealerHomePage extends StatefulWidget {
   final String dealerId;
+  final bool isDealer = true;
 
   const DealerHomePage({Key? key, required this.dealerId}) : super(key: key);
 
@@ -27,39 +28,39 @@ class _DealerHomePageState extends State<DealerHomePage> {
   }
 
   Future<void> _fetchDealerCars() async {
-    setState(() {
-      _isLoading = true;
-    });
+  print('Fetching cars for dealer ID: ${widget.dealerId}'); // Debug the dealerId
+  setState(() {
+    _isLoading = true;
+  });
+  try {
+    final response = await http.get(
+      Uri.parse('http://10.0.2.2:5000/api/dealercars/${widget.dealerId}'),
+    );
 
-    try {
-      print('Fetching cars for dealer ID: ${widget.dealerId}');
-      final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/dealercars/${widget.dealerId}'),
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> carsJson = jsonDecode(response.body);
-        setState(() {
-          _dealerCars = carsJson.map((car) => Car.fromJson(car)).toList();
-          _isLoading = false;
-        });
-      } else {
-        print('Failed to load dealer cars: ${response.body}');
-        throw Exception('Failed to load dealer cars');
-      }
-    } catch (e) {
-      print('Error fetching dealer cars: $e');
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseBody = jsonDecode(response.body); 
+      final List<dynamic> carsJson = responseBody['data'];
       setState(() {
+        _dealerCars = carsJson.map((car) => Car.fromJson(car)).toList();
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load cars')),
-      );
+    } else {
+      print('Failed to load dealer cars: ${response.body}');
+      throw Exception('Failed to load dealer cars');
     }
+  } catch (e) {
+    print('Error fetching dealer cars: $e');
+    setState(() {
+      _isLoading = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Failed to load cars')),
+    );
   }
+}
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { // Debug the dealerId
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -79,7 +80,7 @@ class _DealerHomePageState extends State<DealerHomePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DealerProfilePage(dealerId: widget.dealerId, userId: widget.dealerId),
+                builder: (context) => DealerProfilePage(dealerId: widget.dealerId, isDealer: widget.isDealer),
               ),
             );
           },

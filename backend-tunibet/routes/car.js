@@ -21,26 +21,7 @@ async function formatCarWithImages(car) {
 
 router.get('/', async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        car_id as id, 
-        make, 
-        model, 
-        year, 
-        price, 
-        mileage, 
-        fuel_type, 
-        transmission, 
-        horsepower, 
-        body_type, 
-        color, 
-        condition, 
-        description, 
-        location,
-        is_sold
-      FROM Cars 
-      ORDER BY price DESC
-    `);
+    const result = await pool.query("SELECT car_id as id, make, model, year, price, mileage, fuel_type, transmission, horsepower, body_type, color, condition, description, location, is_sold FROM Cars ORDER BY price DESC;");
     
     const carsWithImages = await Promise.all(
       result.rows.map(car => formatCarWithImages(car))
@@ -49,34 +30,13 @@ router.get('/', async (req, res) => {
     res.json(carsWithImages);
   } catch (error) {
     console.error('Error fetching cars:', error);
-    res.status(500).json({ error: 'Failed to fetch cars' });
+    res.status(500).json({ error: "Failed to fetch cars" });
   }
 });
 
 router.get('/recommended', async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        car_id as id, 
-        make, 
-        model, 
-        year, 
-        price, 
-        mileage, 
-        fuel_type, 
-        transmission, 
-        horsepower, 
-        body_type, 
-        color, 
-        condition, 
-        description, 
-        location,
-        is_sold
-      FROM Cars 
-      WHERE is_sold = FALSE
-      ORDER BY year DESC, price DESC
-      LIMIT 10
-    `);
+    const result = await pool.query("SELECT car_id as id, make, model, year, price, mileage, fuel_type, transmission, horsepower, body_type, color, condition, description, location, is_sold FROM Cars WHERE is_sold = FALSE ORDER BY year DESC, price DESC LIMIT 10;");
     
     const carsWithImages = await Promise.all(
       result.rows.map(car => formatCarWithImages(car))
@@ -97,33 +57,7 @@ router.get('/search', async (req, res) => {
   }
   
   try {
-    const result = await pool.query(`
-      SELECT 
-        car_id as id, 
-        make, 
-        model, 
-        year, 
-        price, 
-        mileage, 
-        fuel_type, 
-        transmission, 
-        horsepower, 
-        body_type, 
-        color, 
-        condition, 
-        description, 
-        location,
-        is_sold
-      FROM Cars 
-      WHERE 
-        (make ILIKE $1 OR 
-        model ILIKE $1 OR
-        body_type ILIKE $1 OR
-        fuel_type ILIKE $1 OR
-        CAST(year AS TEXT) LIKE $1)
-        AND is_sold = FALSE
-      ORDER BY price DESC
-    `, [`%${query}%`]);
+    const result = await pool.query("SELECT car_id as id, make, model, year, price, mileage, fuel_type, transmission, horsepower, body_type, color, condition, description, location, is_sold FROM Cars WHERE (make ILIKE $1 OR model ILIKE $1 OR body_type ILIKE $1 OR fuel_type ILIKE $1 OR CAST(year AS TEXT) LIKE $1) AND is_sold = FALSE ORDER BY price DESC;", [`%${query}%`]);
     
     const carsWithImages = await Promise.all(
       result.rows.map(car => formatCarWithImages(car))
@@ -140,26 +74,7 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
   
   try {
-    const result = await pool.query(`
-      SELECT 
-        car_id as id, 
-        make, 
-        model, 
-        year, 
-        price, 
-        mileage, 
-        fuel_type, 
-        transmission, 
-        horsepower, 
-        body_type, 
-        color, 
-        condition, 
-        description, 
-        location,
-        is_sold
-      FROM Cars 
-      WHERE car_id = $1
-    `, [id]);
+    const result = await pool.query("SELECT car_id as id, make, model, year, price, mileage, fuel_type, transmission, horsepower, body_type, color, condition, description, location, is_sold FROM Cars WHERE car_id = $1;", [id]);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Car not found' });
@@ -190,26 +105,7 @@ router.get('/filter', async (req, res) => {
   } = req.query;
   
   try {
-    let query = `
-      SELECT 
-        car_id as id, 
-        make, 
-        model, 
-        year, 
-        price, 
-        mileage, 
-        fuel_type, 
-        transmission, 
-        horsepower, 
-        body_type, 
-        color, 
-        condition, 
-        description, 
-        location,
-        is_sold
-      FROM Cars 
-      WHERE is_sold = FALSE
-    `;
+    let query = "SELECT car_id as id, make, model, year, price, mileage, fuel_type, transmission, horsepower, body_type, color, condition, description, location, is_sold FROM Cars WHERE is_sold = FALSE;";
     
     const params = [];
     let paramIndex = 1;
@@ -274,7 +170,7 @@ router.get('/filter', async (req, res) => {
       paramIndex++;
     }
     
-    query += ` ORDER BY price DESC`;
+    query += ' ORDER BY price DESC';
     
     const result = await pool.query(query, params);
     
