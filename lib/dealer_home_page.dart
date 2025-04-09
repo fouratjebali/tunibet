@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:tunibet/dealer_profile_page.dart';
 import 'package:tunibet/notification.dart';
+import 'package:tunibet/post_car_page.dart';
 import 'car_model.dart';
 import 'place_bet_page.dart';
 
@@ -28,7 +29,6 @@ class _DealerHomePageState extends State<DealerHomePage> {
   }
 
   Future<void> _fetchDealerCars() async {
-  print('Fetching cars for dealer ID: ${widget.dealerId}'); // Debug the dealerId
   setState(() {
     _isLoading = true;
   });
@@ -101,7 +101,16 @@ class _DealerHomePageState extends State<DealerHomePage> {
           children: [
             ElevatedButton(
               onPressed: () {
-                // Navigate to a page to post a new car
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PostCarPage(dealerId: widget.dealerId),
+                  ),
+                ).then((result) {
+                  if (result == true) {
+                    _fetchDealerCars();
+                  }
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF56021F),

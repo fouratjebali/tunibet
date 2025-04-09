@@ -1,6 +1,8 @@
 const express = require("express");
 const pool = require("../db");
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
 
 async function getCarImages(carId) {
   const imagesResult = await pool.query(
@@ -11,13 +13,47 @@ async function getCarImages(carId) {
 }
 
 async function formatCarWithImages(car) {
+  const baseUrl = "http://10.0.2.2:5000"; 
   const images = await getCarImages(car.id);
+
   return {
     ...car,
-    images: images,
-    image_url: images.length > 0 ? images[0] : null 
+    images: images.map(image => image.startsWith("https") ? image : `${baseUrl}${image}`), // Handle both absolute and relative URLs
+    image_url: images.length > 0
+      ? (images[0].startsWith("https") ? images[0] : `${baseUrl}${images[0]}`) // Handle the first image
+      : null,
   };
 }
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../uploads")); // Save files in the 'uploads' folder
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname)); // Generate a unique filename
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    const fileExtension = path.extname(file.originalname).toLowerCase();
+    console.log(`File MIME type: ${file.mimetype}`);
+    console.log(`File extension: ${fileExtension}`);
+    if (
+      (allowedTypes.includes(file.mimetype) || file.mimetype === "application/octet-stream") &&
+      [".jpg", ".jpeg", ".png"].includes(fileExtension)
+    ) {
+      cb(null, true);
+    } else {
+      console.error(`Unsupported file type: ${file.mimetype}`);
+      cb(new Error("Only JPEG, PNG, and JPG files are allowed"));
+    }
+  },
+});
 
 router.get('/', async (req, res) => {
   try {
@@ -182,6 +218,74 @@ router.get('/filter', async (req, res) => {
   } catch (error) {
     console.error('Error filtering cars:', error);
     res.status(500).json({ error: 'Failed to filter cars' });
+  }
+});
+
+
+router.post("/", upload.array("images", 10), async (req, res) => {
+  const {
+    make,
+    model,
+    year,
+    price,
+    mileage,
+    fuel_type,
+    transmission,
+    horsepower,
+    body_type,
+    color,
+    condition,
+    description,
+    location,
+    dealer_id,
+  } = req.body;
+
+  const files = req.files;
+
+  if (!make || !model || !year || !price || !dealer_id) {
+    return res.status(400).json({ error: "Required fields are missing" });
+  }
+
+  try {
+    const carResult = await pool.query(
+      `INSERT INTO Cars 
+        (make, model, year, price, mileage, fuel_type, transmission, horsepower, body_type, color, condition, description, location, dealer_id, is_sold) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, FALSE) 
+        RETURNING car_id`,
+      [
+        make,
+        model,
+        year,
+        price,
+        mileage || null,
+        fuel_type || null,
+        transmission || null,
+        horsepower || null,
+        body_type || null,
+        color || null,
+        condition || null,
+        description || null,
+        location || null,
+        dealer_id,
+      ]
+    );
+
+    const carId = carResult.rows[0].car_id;
+
+    if (files && files.length > 0) {
+      const imageInsertPromises = files.map((file) =>
+        pool.query(
+          "INSERT INTO carimages (car_id, image_url) VALUES ($1, $2)",
+          [carId, `/uploads/${file.filename}`]
+        )
+      );
+      await Promise.all(imageInsertPromises);
+    }
+
+    res.status(200).json({ message: "Car posted successfully", carId });
+  } catch (error) {
+    console.error("Error posting car:", error);
+    res.status(500).json({ error: "Failed to post car" });
   }
 });
 

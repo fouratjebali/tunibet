@@ -17,12 +17,16 @@ async function getCarImages(carId) {
 
 async function formatCarWithImages(car) {
   try {
+    const baseUrl = "http://10.0.2.2:5000"; 
     const images = await getCarImages(car.car_id);
+
     return {
       ...car,
-      images: images,
-      image_url: images.length > 0 ? images[0] : null,
-      is_sold: car.is_sold || false 
+      images: images.map(image => image.startsWith("https") ? image : `${baseUrl}${image}`), 
+      image_url: images.length > 0
+        ? (images[0].startsWith("https") ? images[0] : `${baseUrl}${images[0]}`) 
+        : null,
+      is_sold: car.is_sold || false,
     };
   } catch (error) {
     console.error(`Error formatting car ${car.car_id}:`, error);
@@ -30,7 +34,7 @@ async function formatCarWithImages(car) {
       ...car,
       images: [],
       image_url: null,
-      is_sold: car.is_sold || false
+      is_sold: car.is_sold || false,
     };
   }
 }
@@ -53,7 +57,7 @@ router.get('/:id', async (req, res) => {
 
 
     const carsResult = await pool.query(
-      "SELECT car_id, make, model, year, price, mileage, is_sold FROM cars WHERE dealer_id = $1 and is_sold=FALSE;",
+      "SELECT car_id, make, model, year, price, mileage, is_sold FROM cars WHERE dealer_id = $1 and is_sold=FALSE ORDER BY car_id DESC;",
       [id]
     );
 
