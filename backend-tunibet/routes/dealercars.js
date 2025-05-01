@@ -18,7 +18,7 @@ async function getCarImages(carId) {
 async function formatCarWithImages(car) {
   try {
     const baseUrl = "http://10.0.2.2:5000"; 
-    const images = await getCarImages(car.car_id);
+    const images = await getCarImages(car.id);
 
     return {
       ...car,
@@ -29,7 +29,7 @@ async function formatCarWithImages(car) {
       is_sold: car.is_sold || false,
     };
   } catch (error) {
-    console.error(`Error formatting car ${car.car_id}:`, error);
+    console.error(`Error formatting car ${car.id}:`, error);
     return {
       ...car,
       images: [],
@@ -57,7 +57,7 @@ router.get('/:id', async (req, res) => {
 
 
     const carsResult = await pool.query(
-      "SELECT car_id, make, model, year, price, mileage, is_sold FROM cars WHERE dealer_id = $1 and is_sold=FALSE ORDER BY car_id DESC;",
+      "SELECT car_id as id, make, model, year, price, mileage, is_sold FROM cars WHERE dealer_id = $1 and is_sold=FALSE ORDER BY car_id DESC;",
       [id]
     );
 

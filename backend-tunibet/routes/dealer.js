@@ -9,7 +9,6 @@ require("dotenv").config();
 
 const JWT_SECRET = process.env.JWT_SECRET || "yourSuperSecretKey";
 
-// Configure multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
@@ -21,17 +20,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Register a new dealer
 router.post("/register", async (req, res) => {
   const { dealerName, email, password, phoneNumber } = req.body;
 
-  // Validate input
   if (!dealerName || !email || !password || !phoneNumber) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
   try {
-    // Check if dealer already exists
     const existingDealer = await pool.query(
       "SELECT * FROM dealers WHERE email = $1 OR phone_number = $2",
       [email, phoneNumber]
@@ -41,13 +37,11 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Email or phone number already exists" });
     }
 
-    // Reset sequence if table is empty (only for development/testing)
     const empty = await pool.query("SELECT * FROM dealers;");
     if (empty.rows.length === 0) {
       await pool.query("ALTER SEQUENCE dealers_id_seq RESTART WITH 1;");
     }
 
-    // Hash password and create new dealer
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     
@@ -66,7 +60,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Dealer login
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -107,7 +100,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Get dealer profile
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   
@@ -136,7 +128,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Update dealer profile
 router.put('/:id', upload.single('profileImage'), async (req, res) => {
   const { id } = req.params;
   const { dealerName, email, password, phoneNumber } = req.body;
@@ -146,7 +137,6 @@ router.put('/:id', upload.single('profileImage'), async (req, res) => {
     let updateQuery = 'UPDATE dealers SET dealer_name = $1, email = $2, phone_number = $3';
     const queryParams = [dealerName, email, phoneNumber];
     
-    // Only update password if provided
     if (password) {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
@@ -163,22 +153,18 @@ router.put('/:id', upload.single('profileImage'), async (req, res) => {
       return res.status(404).json({ error: 'Dealer not found' });
     }
 
-    // Handle profile image update
     if (profileImage) {
-      // Check if image record exists
       const imageCheck = await pool.query(
         'SELECT * FROM dealerimage WHERE dealer_id = $1',
         [id]
       );
 
       if (imageCheck.rows.length > 0) {
-        // Update existing image
         await pool.query(
           'UPDATE dealerimage SET image_url = $1 WHERE dealer_id = $2',
           [profileImage, id]
         );
       } else {
-        // Insert new image record
         await pool.query(
           'INSERT INTO dealerimage (dealer_id, image_url) VALUES ($1, $2)',
           [id, profileImage]

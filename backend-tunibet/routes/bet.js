@@ -4,7 +4,7 @@ const pool = require('../db');
 
 router.get('/last-bets', async (req, res) => {
   const { car_id } = req.query;
-
+  console.log('Fetching last bets for car:', car_id);
   if (!car_id) {
     return res.status(400).json({ error: "car_id is required" });
   }

@@ -1,23 +1,24 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tunibet/signin-dealer.dart';
 import 'dart:convert';
-import 'signup-page.dart';
+import 'signin_page.dart';
+import 'signup_dealer.dart';
 import 'package:http/http.dart' as http;
 
-class SignUpDealer extends StatefulWidget {
-  const SignUpDealer({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
   @override
-  State<SignUpDealer> createState() => _SignUpPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
   
-class _SignUpPageState extends State<SignUpDealer> {
+class _SignUpPageState extends State<SignUpPage> {
   late final TextEditingController _email;
   late final TextEditingController _password;
   late final TextEditingController _phone;
-  late final TextEditingController _dealername;
+  late final TextEditingController _name;
   File? _selectedImage;
   String? _userId;
 
@@ -27,7 +28,7 @@ class _SignUpPageState extends State<SignUpDealer> {
     super.initState();
     _email = TextEditingController();
     _password = TextEditingController();
-    _dealername = TextEditingController();
+    _name = TextEditingController();
     _phone = TextEditingController();
   }
 
@@ -36,7 +37,7 @@ class _SignUpPageState extends State<SignUpDealer> {
     _email.dispose();
     _password.dispose();
     _phone.dispose();
-    _dealername.dispose();
+    _name.dispose();
     super.dispose();
   }
   Future<void> _pickImage() async {
@@ -52,10 +53,10 @@ class _SignUpPageState extends State<SignUpDealer> {
 
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://10.0.2.2:5000/api/dealers/upload-profile'),
+      Uri.parse('http://10.0.2.2:5000/api/users/upload-profile'),
     );
 
-    request.fields['dealer_id'] = _userId!;
+    request.fields['id'] = _userId!;
     request.files.add(await http.MultipartFile.fromPath('image', _selectedImage!.path));
 
     final response = await request.send();
@@ -66,7 +67,7 @@ class _SignUpPageState extends State<SignUpDealer> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SignInDealer()),
+        MaterialPageRoute(builder: (context) => const SignInPage()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -122,7 +123,7 @@ class _SignUpPageState extends State<SignUpDealer> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'SIGN UP AS A DEALER',
+                'SIGN UP',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   color: Colors.black,
@@ -140,11 +141,11 @@ class _SignUpPageState extends State<SignUpDealer> {
               ),
               const SizedBox(height: 50),
               TextField(
-                controller: _dealername,
+                controller: _name,
                 decoration: InputDecoration(
                   fillColor: Colors.grey[100],
                   filled: true,
-                  hintText: 'Dealer Name',
+                  hintText: 'Full Name',
                   prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -158,7 +159,7 @@ class _SignUpPageState extends State<SignUpDealer> {
                 decoration: InputDecoration(
                   fillColor: Colors.grey[100],
                   filled: true,
-                  hintText: 'Email address for customer inquiries',
+                  hintText: 'Email',
                   prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -187,7 +188,7 @@ class _SignUpPageState extends State<SignUpDealer> {
                 decoration: InputDecoration(
                   fillColor: Colors.grey[100],
                   filled: true,
-                  hintText: 'Dealer Mobile Phone Number',
+                  hintText: 'Phone Number',
                   prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -210,15 +211,15 @@ class _SignUpPageState extends State<SignUpDealer> {
                     final email = _email.text;
                     final password = _password.text;
                     final phone = _phone.text;
-                    final name = _dealername.text;
+                    final name = _name.text;
                     
-                    const String apiUrl = "http://10.0.2.2:5000/api/dealers/register";
+                    const String apiUrl = "http://10.0.2.2:5000/api/users/register";
 
                     final response = await http.post(
                       Uri.parse(apiUrl),
                       headers: {"Content-Type": "application/json"},
                       body: jsonEncode({
-                        "dealerName": name,
+                        "fullName": name,
                         "email": email,
                         "password": password,
                         "phoneNumber": phone,
@@ -227,16 +228,16 @@ class _SignUpPageState extends State<SignUpDealer> {
 
                     if (response.statusCode == 201) {
                       final responseData = jsonDecode(response.body);
-                      _onSignUpSuccess(responseData['dealer']['dealer_id'].toString());
-                      print("Dealer Created: ${responseData['dealer']}");
-
+                       _onSignUpSuccess(responseData['user']['id'].toString());
+                      print("User Created: ${responseData['user']}");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Dealer created successfully!")),
+                        SnackBar(content: Text("User created successfully!")),
+                         
                       );
                     } else {
                       print("Error: ${response.body}");
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Failed to create Dealer")),
+                        SnackBar(content: Text("Failed to create user")),
                       );
                     }
                   },
@@ -252,11 +253,57 @@ class _SignUpPageState extends State<SignUpDealer> {
                 ),
               ),
               const SizedBox(height: 20),
+              const Text(
+                'OR'
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                'Sign Up with :'
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                    
+                    },
+                    child: const Icon(
+                      FontAwesomeIcons.google,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  GestureDetector(
+                    onTap: () {
+                      
+                    },
+                    child: const Icon(
+                      FontAwesomeIcons.apple,
+                      color: Colors.black,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  GestureDetector(
+                    onTap: () {
+                      
+                    },
+                    child: const Icon(
+                      FontAwesomeIcons.facebook,
+                      color: Colors.blue,
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Are you a normal user? ",
+                    "Are you a dealer? ",
                     style: TextStyle(color: Colors.black54),
                   ),
                   GestureDetector(
@@ -264,12 +311,39 @@ class _SignUpPageState extends State<SignUpDealer> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const SignUpPage(),
+                          builder: (context) => const SignUpDealer(),
                         ),
                       );
                     },
                     child: const Text(
-                      'User Sign up',
+                      'Sign up as a Dealer',
+                      style: TextStyle(
+                        color: Color(0xFF56021F),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),        
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Already have an account? ",
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SignInPage(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Login',
                       style: TextStyle(
                         color: Color(0xFF56021F),
                         fontWeight: FontWeight.bold,

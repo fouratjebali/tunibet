@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'car_model.dart';
+import 'user_helper.dart';
 
 class PlaceBetPage extends StatefulWidget {
   final Car car;
@@ -16,21 +16,20 @@ class PlaceBetPage extends StatefulWidget {
 
 class _PlaceBetPageState extends State<PlaceBetPage> {
   final TextEditingController _betAmountController = TextEditingController();
-  bool _isLoading = false;
   List<Map<String, dynamic>> _lastBets = [];
-  int? _userId;
-Future<void> _loadUserId() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  setState(() {
-    _userId = prefs.getInt('user_id');
-  });
-}
+  String? _userId;
+
+  void getUserId() async {
+    _userId = await UserHelper.getUserId();
+    print("User ID: $_userId");
+  }
+
   @override
   void initState() {
     super.initState();
     _betAmountController.text = widget.car.price.toStringAsFixed(0);
     _fetchLastBets();
-    _loadUserId();
+    getUserId();
   }
 
 
@@ -38,14 +37,12 @@ Future<void> _loadUserId() async {
 Future<void> _fetchLastBets() async {
   
   try {
-    
     final response = await http.get(
       Uri.parse('http://10.0.2.2:5000/api/bets/last-bets?car_id=${widget.car.id}'),
     );
 
     if (response.statusCode == 200) {
       final bets = List<Map<String, dynamic>>.from(json.decode(response.body));
-      print('Fetched Last Bets: $bets');
       setState(() {
         _lastBets = bets;
         if (_lastBets.isNotEmpty) {
@@ -76,8 +73,6 @@ Future<void> _acceptLastBet() async {
       'user_id': lastBet['user_id'],
       'amount': lastBet['amount'],
     };
-
-    print('Request Body: $body'); // Debug the body being sent
 
     final response = await http.post(
       Uri.parse('http://10.0.2.2:5000/api/bets/accept-bet'),
@@ -116,10 +111,6 @@ Future<void> _acceptLastBet() async {
     return;
   }
 
-    setState(() {
-      _isLoading = true;
-    });
-
     try {
       final response = await http.post(
         Uri.parse('http://10.0.2.2:5000/api/bets/place-bet'),
@@ -143,11 +134,7 @@ Future<void> _acceptLastBet() async {
       }
     } catch (e) {
       print('Error placing bet: $e');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    } 
   }
 
   @override
@@ -172,7 +159,6 @@ Widget build(BuildContext context) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Editable Price Field
         TextField(
           controller: _betAmountController,
           keyboardType: TextInputType.number,

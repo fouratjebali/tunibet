@@ -1,5 +1,5 @@
 class Car {
-  final String id;
+  final int id;
   final String make;
   final String model;
   final int year;
@@ -46,11 +46,11 @@ class Car {
     String mainImage = json['image_url'] ?? (imagesList.isNotEmpty ? imagesList[0] : '');
 
     return Car(
-      id: json['car_id'].toString() ?? '',
+      id: json['id'],
       make: json['make'],
       model: json['model'],
       year: json['year'] ?? 0,
-      price: double.parse(json['price'].toString()) ?? 0.0,
+      price: double.parse(json['price'].toString()),
       mileage: json['mileage'],
       fuelType: json['fuel_type'],
       transmission: json['transmission'],

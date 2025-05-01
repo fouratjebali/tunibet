@@ -38,6 +38,7 @@ class CarService {
       } else {
         throw Exception('Failed to load recommended cars: ${response.statusCode}');
       }
+      
     } catch (error) {
       print('Error fetching recommended cars: $error');
       throw Exception('Failed to load recommended cars: $error');
@@ -307,12 +308,8 @@ class CarCard extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    print('Car ID: ${car.id}'); 
-    print('Car Make: ${car.make}');
     return GestureDetector(
       onTap: () {
-        print(car.id); 
-        print(car.make);
         Navigator.push(
           context,
           MaterialPageRoute(

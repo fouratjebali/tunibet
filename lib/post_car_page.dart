@@ -3,15 +3,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PostCarPage extends StatefulWidget {
-  final String dealerId;
 
-  const PostCarPage({Key? key, required this.dealerId}) : super(key: key);
+  const PostCarPage({Key? key}) : super(key: key);
 
   @override
   _PostCarPageState createState() => _PostCarPageState();
 }
+
+Future<int?> _getDealerId() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('userId');
+}
+
 
 class _PostCarPageState extends State<PostCarPage> {
   final _formKey = GlobalKey<FormState>();
@@ -46,7 +52,8 @@ class _PostCarPageState extends State<PostCarPage> {
   Future<void> _submitForm() async {
   if (_formKey.currentState!.validate()) {
     _formKey.currentState!.save();
-    _carData['dealer_id'] = widget.dealerId;
+    final dealerId = await _getDealerId();
+    _carData['dealer_id'] = dealerId.toString();
 
     try {
       final uri = Uri.parse('http://10.0.2.2:5000/api/cars'); 
@@ -217,14 +224,12 @@ class _PostCarPageState extends State<PostCarPage> {
                   onSaved: (value) => _carData['location'] = value,
                 ),
                 const SizedBox(height: 20),
-                // Image picker button
                 ElevatedButton.icon(
                   onPressed: _pickImages,
                   icon: const Icon(Icons.image),
                   label: const Text('Pick Images'),
                 ),
                 const SizedBox(height: 10),
-                // Display selected images
                 Wrap(
                   spacing: 8.0,
                   runSpacing: 8.0,

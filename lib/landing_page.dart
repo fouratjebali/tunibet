@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tunibet/dealer_home_page.dart';
-import 'package:tunibet/signin-dealer.dart';
 import 'home_page.dart';
+import 'signin_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LandingPage extends StatefulWidget {
@@ -25,24 +25,21 @@ class _LandingPageState extends State<LandingPage> {
     final int? userId = prefs.getInt('userId');
 
     if (userType == 'user' && userId != null) {
-      // Navigate to HomePage for users
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } else if (userType == 'dealer' && userId != null) {
-      // Navigate to DealerHomePage for dealers
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => DealerHomePage(dealerId: userId.toString()),
+          builder: (context) => const DealerHomePage(), 
         ),
       );
     } else {
-      // No one is logged in, navigate to login page
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SignInDealer()),
+        MaterialPageRoute(builder: (context) => const SignInPage()),
       );
     }
   }

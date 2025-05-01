@@ -3,19 +3,28 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:tunibet/dealer_profile_page.dart';
-import 'package:tunibet/notification.dart';
 import 'package:tunibet/post_car_page.dart';
 import 'car_model.dart';
 import 'place_bet_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DealerHomePage extends StatefulWidget {
-  final String dealerId;
-  final bool isDealer = true;
+ 
 
-  const DealerHomePage({Key? key, required this.dealerId}) : super(key: key);
+  const DealerHomePage({Key? key}) : super(key: key);
 
   @override
   State<DealerHomePage> createState() => _DealerHomePageState();
+}
+
+Future<String?> _getDealerId() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final id = prefs.getInt('userId').toString();
+  if (id == "") {
+    print("userId not found in SharedPreferences.");
+    return "";
+  }
+  return id;
 }
 
 class _DealerHomePageState extends State<DealerHomePage> {
@@ -26,15 +35,33 @@ class _DealerHomePageState extends State<DealerHomePage> {
   void initState() {
     super.initState();
     _fetchDealerCars();
+    _getDealerId();
   }
 
   Future<void> _fetchDealerCars() async {
   setState(() {
     _isLoading = true;
   });
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final dealerId = prefs.getInt("userId");
+
+  if (dealerId == null) {
+    print("dealerId not found in SharedPreferences");
+    setState(() {
+      _isLoading = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Dealer ID not found')),
+    );
+    return;
+  }
+
+  print("dealerId: $dealerId"); 
+
   try {
     final response = await http.get(
-      Uri.parse('http://10.0.2.2:5000/api/dealercars/${widget.dealerId}'),
+      Uri.parse('http://10.0.2.2:5000/api/dealercars/$dealerId'),
     );
 
     if (response.statusCode == 200) {
@@ -44,6 +71,7 @@ class _DealerHomePageState extends State<DealerHomePage> {
         _dealerCars = carsJson.map((car) => Car.fromJson(car)).toList();
         _isLoading = false;
       });
+      print("dealerCars: ${_dealerCars}");
     } else {
       print('Failed to load dealer cars: ${response.body}');
       throw Exception('Failed to load dealer cars');
@@ -60,7 +88,7 @@ class _DealerHomePageState extends State<DealerHomePage> {
 }
 
   @override
-  Widget build(BuildContext context) { // Debug the dealerId
+  Widget build(BuildContext context) { 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -80,7 +108,7 @@ class _DealerHomePageState extends State<DealerHomePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DealerProfilePage(dealerId: widget.dealerId, isDealer: widget.isDealer),
+                builder: (context) => DealerProfilePage(),
               ),
             );
           },
@@ -104,7 +132,7 @@ class _DealerHomePageState extends State<DealerHomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PostCarPage(dealerId: widget.dealerId),
+                    builder: (context) => PostCarPage(),
                   ),
                 ).then((result) {
                   if (result == true) {
@@ -199,7 +227,7 @@ class CarCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   image: DecorationImage(
-                    image: NetworkImage(car.imageUrl ?? 'https://via.placeholder.com/100'),
+                    image: NetworkImage(car.imageUrl),
                     fit: BoxFit.cover,
                   ),
                 ),

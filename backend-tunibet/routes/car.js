@@ -18,31 +18,29 @@ async function formatCarWithImages(car) {
 
   return {
     ...car,
-    images: images.map(image => image.startsWith("https") ? image : `${baseUrl}${image}`), // Handle both absolute and relative URLs
+    images: images.map(image => image.startsWith("https") ? image : `${baseUrl}${image}`), 
     image_url: images.length > 0
-      ? (images[0].startsWith("https") ? images[0] : `${baseUrl}${images[0]}`) // Handle the first image
+      ? (images[0].startsWith("https") ? images[0] : `${baseUrl}${images[0]}`) 
       : null,
   };
 }
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../uploads")); // Save files in the 'uploads' folder
+    cb(null, path.join(__dirname, "../uploads")); 
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname)); // Generate a unique filename
+    cb(null, uniqueSuffix + path.extname(file.originalname)); 
   },
 });
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+  limits: { fileSize: 5 * 1024 * 1024 }, 
   fileFilter: (req, file, cb) => {
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
     const fileExtension = path.extname(file.originalname).toLowerCase();
-    console.log(`File MIME type: ${file.mimetype}`);
-    console.log(`File extension: ${fileExtension}`);
     if (
       (allowedTypes.includes(file.mimetype) || file.mimetype === "application/octet-stream") &&
       [".jpg", ".jpeg", ".png"].includes(fileExtension)

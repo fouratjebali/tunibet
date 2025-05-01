@@ -5,11 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tunibet/dealer_home_page.dart';
-import 'package:tunibet/signup-dealer.dart';
-import 'package:tunibet/dealer_home_page.dart';
+import 'package:tunibet/signup_dealer.dart';
 
-import 'signup-page.dart';
-import 'home_page.dart';
 
 
 class SignInDealer extends StatefulWidget {
@@ -139,24 +136,24 @@ class _SignInPageState extends State<SignInDealer> {
                     );
 
                     final data = jsonDecode(response.body);
-
+                    print(data);
                     if (response.statusCode == 200) {
-                      // Save token
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       await prefs.setString("token", data["token"]);
                       await prefs.setString("userEmail", data["dealer"]["email"]);
                       await prefs.setInt("userId", data["dealer"]["dealer_id"]);
-                      print(data["dealer"]["dealer_id"]);
                       await prefs.setString("userType", "dealer");
 
+                      print("✅ token: ${prefs.getString("token")}");
+                      print("✅ userEmail: ${prefs.getString("userEmail")}");
+                      print("✅ userId: ${prefs.getInt("userId").toString()}");
+                      print("✅ userType: ${prefs.getString("userType")}");
                       if (!mounted) return;
 
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DealerHomePage(
-                            dealerId: data["dealer"]["dealer_id"].toString(),
-                          ),
+                          builder: (context) => const DealerHomePage(),
                         ),
                       );
                     } else {

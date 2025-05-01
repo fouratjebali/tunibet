@@ -4,19 +4,19 @@ import 'package:http/http.dart' as http;
 import 'package:tunibet/edit_dealer_profile_page.dart';
 import 'signin_page.dart';
 import 'user_helper.dart';
-import 'edit_profile_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 const String baseUrl = 'http://10.0.2.2:5000/api'; 
 
 class User {
   final String id;
   final String email;
-  final String fullName;
+  final String dealerName;
   final String? profileImage;
 
   User({
     required this.id,
     required this.email,
-    required this.fullName,
+    required this.dealerName,
     this.profileImage,
   });
 
@@ -24,21 +24,27 @@ class User {
     return User(
       id: json['id']?.toString() ?? '',
       email: json['email'] ?? 'email@example.com',
-      fullName: json['fullName'] ?? 'Dealer',
+      dealerName: json['dealerName'] ?? 'Dealer',
       profileImage: json['profileImage'],
     );
   }
 }
 
 class DealerProfilePage extends StatefulWidget {
-  final String dealerId;
-  final bool isDealer;
+ 
 
-  const DealerProfilePage({Key? key, required this.dealerId, required this.isDealer}) : super(key: key);
+  const DealerProfilePage({Key? key}) : super(key: key);
 
   @override
   State<DealerProfilePage> createState() => _ProfilePageState();
 }
+
+Future<int?> _getDealerId() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('userId');
+}
+
+
 
 class _ProfilePageState extends State<DealerProfilePage> {
   bool _isLoading = true;
@@ -51,14 +57,14 @@ class _ProfilePageState extends State<DealerProfilePage> {
     _fetchUserProfile();
   }
   String getFullImageUrl(String? relativeUrl) {
-  const String baseUrl = 'http://10.0.2.2:5000'; // Replace with your backend's base URL
+  const String baseUrl = 'http://10.0.2.2:5000'; 
   if (relativeUrl == null || relativeUrl.isEmpty) {
-    return '$baseUrl/uploads/default-profile.jpg'; // Default image
+    return '$baseUrl/uploads/default-profile.jpg';
   }
   if (relativeUrl.startsWith('http')) {
-    return relativeUrl; // Already a full URL
+    return relativeUrl; 
   }
-  return '$baseUrl$relativeUrl'; // Append base URL to relative path
+  return '$baseUrl$relativeUrl'; 
 }
 
   Future<void> _fetchUserProfile() async {
@@ -68,17 +74,15 @@ class _ProfilePageState extends State<DealerProfilePage> {
   });
 
   try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final dealerId = prefs.getInt("userId");
     final response = await http.get(
-      Uri.parse("$baseUrl/dealers/${widget.dealerId}"),
+      Uri.parse("http://10.0.2.2:5000/api/dealers/${dealerId}"),
     );
-    print('Response status code: ${response.statusCode}');
-    print('Response body: ${response.body}');
     if (response.statusCode == 200) {
       final userData = jsonDecode(response.body);
-      print('Parsed user data: $userData');
       setState(() {
         _user = User.fromJson(userData);
-        print('User data: $_user');
         _isLoading = false;
         });
       
@@ -124,7 +128,6 @@ class _ProfilePageState extends State<DealerProfilePage> {
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
             onPressed: () {
-              // Navigate to settings page
             },
           ),
         ],
@@ -142,12 +145,10 @@ class _ProfilePageState extends State<DealerProfilePage> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Profile section
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // Profile image
                 CircleAvatar(
                   radius: 50,
                   backgroundColor: Colors.grey[200],
@@ -158,16 +159,14 @@ class _ProfilePageState extends State<DealerProfilePage> {
                 ),
                 const SizedBox(height: 16),
                 
-                // User name
                 Text(
-                  _user?.fullName ?? 'Dealer',
+                  _user?.dealerName ?? 'Dealer',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 
-                // User email
                 Text(
                   _user?.email ?? 'email@example.com',
                   style: TextStyle(
@@ -177,15 +176,14 @@ class _ProfilePageState extends State<DealerProfilePage> {
                 ),
                 
                 const SizedBox(height: 16),
-                
-                // Edit profile button
+              
                 ElevatedButton(
                   onPressed: () async {
-
+                    final dealerId = await _getDealerId();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => EditDealerProfilePage(dealerId: widget.dealerId ?? ''),
+                        builder: (context) => EditDealerProfilePage(dealerId: dealerId.toString()),
                       ),
                     );
                   },
@@ -238,7 +236,6 @@ class _ProfilePageState extends State<DealerProfilePage> {
       color: Colors.grey,
     ),
     onTap: () {
-      // Handle menu item tap
       if (isLogout) {
         showDialog(
           context: context,
@@ -252,14 +249,11 @@ class _ProfilePageState extends State<DealerProfilePage> {
               ),
               TextButton(
                 onPressed: () async {
-                  // Perform logout using UserHelper
                   await UserHelper.logout();
                   
-                  // Close dialog and navigate to login page
                   if (!context.mounted) return;
                   Navigator.of(context).popUntil((route) => route.isFirst);
                   
-                  // Replace the current route with the login page
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const SignInPage()),

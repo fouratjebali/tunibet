@@ -23,6 +23,7 @@ class _CarDetailPageState extends State<CarDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('Car Detail Page: ${widget.car.id}');
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

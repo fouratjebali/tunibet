@@ -4,9 +4,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tunibet/signin-dealer.dart';
+import 'package:tunibet/signin_dealer.dart';
 
-import 'signup-page.dart';
+import 'signup_page.dart';
 import 'home_page.dart';
 
 
@@ -139,7 +139,6 @@ class _SignInPageState extends State<SignInPage> {
                     final data = jsonDecode(response.body);
 
                     if (response.statusCode == 200) {
-                      // Save token
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       await prefs.setString("token", data["token"]);
                       await prefs.setString("userEmail", data["user"]["email"]);
